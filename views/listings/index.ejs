@@ -1,0 +1,241 @@
+<% layout('./layouts/boilerplate') -%>
+
+<style>
+  /* Wrapper to align filters and tax toggle */
+  .filters-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px;
+  }
+
+  /* Scrollable Filters Container */
+  .slider-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+      width: 85%; /* Takes most of the width */
+      overflow: hidden;
+      padding: 10px 0;
+  }
+
+  /* Arrow buttons */
+  .arrow {
+      background-color: white;
+      border: none;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      font-size: 20px;
+      position: absolute;
+      z-index: 10;
+      transition: opacity 0.3s ease-in-out, transform 0.2s;
+      user-select: none;
+  }
+
+  .arrow:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.1);
+  }
+
+  .left-arrow {
+      left: 10px;
+      opacity: 0;
+      visibility: hidden;
+  }
+
+  .right-arrow {
+      right: 10px;
+  }
+
+  /* Scrollable Filter div */
+  #filters {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      white-space: nowrap;
+      padding: 10px;
+      scrollbar-width: none;
+      width: 100%;
+      margin: 0 50px;
+  }
+
+  #filters::-webkit-scrollbar {
+      display: none;
+  }
+
+  .filter {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0.7;
+      transition: opacity 0.3s ease-in-out;
+      padding: 10px;
+      flex-shrink: 0;
+  }
+
+  .filter:hover {
+      opacity: 1;
+      cursor: pointer;
+  }
+
+  .filter i {
+      font-size: 24px;
+      margin-bottom: 5px;
+  }
+
+
+  .tax-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px; /* Reduced padding for a more compact look */
+    margin-left: 30px;
+    background-color: #007bff;
+    color: white;
+    border: 1.5px solid transparent;
+    border-radius: 18px; /* Keeps a modern, slightly rounded look */
+    font-size: 13px; /* Slightly smaller font to save space */
+    font-weight: 500;
+    letter-spacing: 0.4px; /* Minimal letter spacing for readability */
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tax-toggle:hover {
+    background-color: #0056b3;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tax-toggle:active {
+    transform: scale(0.98);
+}
+
+
+
+
+  .tax-info{
+    display: none;
+  }
+
+</style>
+
+<div class="filters-wrapper">
+  <!-- Scrollable Filters Section -->
+  <div class="slider-container">
+      <button class="arrow left-arrow" id="leftArrow" onclick="scrollLeft()">◀</button>
+      <div id="filters" onscroll="checkScroll()">
+          <div class="filter"><div><i class="fa-solid fa-fire"></i></div><b>Trending</b></div>
+          <div class="filter"><div><i class="fa-solid fa-bed"></i></div><b>Rooms</b></div>
+          <div class="filter"><div><i class="fa-solid fa-mountain-city"></i></div><b>Iconic Cities</b></div>
+          <div class="filter"><div><i class="fa-solid fa-mountain-sun"></i></div><b>Mountains</b></div>
+          <div class="filter"><div><i class="fa-brands fa-fort-awesome"></i></div><b>Castles</b></div>
+          <div class="filter"><div><i class="fa-solid fa-person-swimming"></i></div><b>Amazing Pools</b></div>
+          <div class="filter"><div><i class="fa-solid fa-tents"></i></div><b>Campings</b></div>
+          <div class="filter"><div><i class="fa-solid fa-tractor"></i></div><b>Farms</b></div>
+          <div class="filter"><div><i class="fa-solid fa-snowflake"></i></div><b>Arctic</b></div>
+          <div class="filter"><div><i class="fa-solid fa-umbrella-beach"></i></div><b>Beach</b></div>
+      </div>
+      <button class="arrow right-arrow" id="rightArrow" onclick="scrollRight()">▶</button>
+  </div>
+
+  <div class="tax-toggle">
+  <div class="form-check-reverse form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+    <label class="form-check-label" for="flexSwitchCheckDefault">Display Total after Taxes</label>
+  </div>
+</div>
+</div>
+<div class="row row-cols-lg-3 row-cols-md-2  row-cols-sm-1 mt-3">
+<% for (let list of alllisting) { %>
+    <a href="/listings/<%= list._id %> " class="listing-link">
+<div class="card col listing-card" >
+    <img src="<%= list.image.url %>" class="card-img-top" alt="Listing-image" style="height: 20rem">
+    <div class="card-img-overlay"></div>
+    <div class="card-body">
+      <b>
+      <p class="card-text">
+       <%= list.title %></b> <br>
+        &#8377;<%= list.price.toLocaleString("en-IN")%> / night
+        <i class="tax-info">&nbsp; &nbsp; + 18% GST</i>
+      </p>
+    </div>
+
+  </div>
+</a>
+<%}%>
+
+
+</div>
+
+<script src="https://kit.fontawesome.com/YOUR_FA_KIT.js" crossorigin="anonymous"></script>
+
+<script>
+  const filters = document.getElementById("filters");
+  const leftArrow = document.getElementById("leftArrow");
+  const rightArrow = document.getElementById("rightArrow");
+  const taxSwitch=document.getElementById('flexSwitchCheckDefault');
+ 
+  taxSwitch.addEventListener("click",()=>{
+    let taxinfo=document.getElementsByClassName("tax-info");
+    for(info of taxinfo){
+      if(info.style.display != "inline"){
+        info.style.display="inline";
+        
+      }else{
+        info.style.display="none";
+      }
+    }
+  }) 
+
+  function scrollRight() {
+      filters.scrollBy({ left: 200, behavior: "smooth" });
+      checkScroll(); 
+  }
+
+  function scrollLeft() {
+      filters.scrollBy({ left: -200, behavior: "smooth" });
+      checkScroll(); 
+  }
+
+  function checkScroll() {
+      const scrollLeftValue = filters.scrollLeft;
+      const maxScrollLeft = filters.scrollWidth - filters.clientWidth;
+
+      // Show left arrow only when scrolled right at least once
+      if (scrollLeftValue > 0) {
+          leftArrow.style.opacity = "1";
+          leftArrow.style.visibility = "visible";
+          leftArrow.style.pointerEvents = "auto";
+      } else {
+          leftArrow.style.opacity = "0";
+          leftArrow.style.visibility = "hidden";
+          leftArrow.style.pointerEvents = "none";
+      }
+
+      // Show right arrow only when there is more content to scroll
+      if (scrollLeftValue < maxScrollLeft - 5) {
+          rightArrow.style.opacity = "1";
+          rightArrow.style.pointerEvents = "auto";
+      } else {
+          rightArrow.style.opacity = "0";
+          rightArrow.style.pointerEvents = "none";
+      }
+  }
+
+
+  // Run checkScroll on load
+  window.onload = checkScroll;
+</script>
+
